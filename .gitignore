@@ -1,0 +1,32 @@
+# Datos reales (sensibles: nunca al repositorio)
+data/
+*.xlsx
+*.parquet
+
+# Credenciales
+.env
+keys/
+*credentials*.json
+*service-account*.json
+
+# Python
+venv/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+
+# Editor / sistema
+.vscode/
+.DS_Store
