@@ -17,3 +17,20 @@ seeds:
               arguments:
                 values: [-1, 0, 1]
                 quote: false
+
+  - name: categoria_etiqueta
+    description: "Nombre legible, tipo de flujo (ingreso o egreso) y orden de cada categoría que llega al modelo final."
+    columns:
+      - name: categoria
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('categoria_documento')
+                field: categoria
+      - name: tipo_flujo
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["ingreso", "egreso"]

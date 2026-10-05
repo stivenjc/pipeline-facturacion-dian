@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: dim_fecha
+    description: "Calendario con un día por fila, en español."
+    columns:
+      - name: fecha
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_tercero
+    description: "Clientes, proveedores y prestadores de servicios, una fila por NIT."
+    columns:
+      - name: nit
+        tests:
+          - unique
+          - not_null
+      - name: nombre
+        tests:
+          - not_null
+
+  - name: dim_categoria
+    description: "Categorías de negocio con nombre legible y tipo de flujo, una fila por categoría."
+    columns:
+      - name: categoria
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_documentos
+    description: "Hecho central: una fila por documento de venta, compra o pago a prestadores, con sus montos netos."
+    columns:
+      - name: cufe_cude
+        tests:
+          - unique
+          - not_null
+      - name: fecha_emision
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fecha')
+                field: fecha
+      - name: nit_tercero
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_tercero')
+                field: nit
+      - name: categoria
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_categoria')
+                field: categoria
+      - name: base_neta
+        tests:
+          - not_null
+
+  - name: fct_nomina_mensual
+    description: "Nómina agregada por mes. Sin detalle por persona. El total es el que reporta la DIAN; falta confirmar si es devengado o neto."
+    columns:
+      - name: periodo
+        description: "Primer día del mes de emisión."
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fecha')
+                field: fecha
+      - name: total_nomina
+        tests:
+          - not_null

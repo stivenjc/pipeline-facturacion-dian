@@ -1,0 +1,4 @@
+categoria,etiqueta,tipo_flujo,orden
+venta,Ventas,ingreso,1
+compra,Compras a proveedores,egreso,2
+pago_prestadores,Pagos a prestadores de servicios,egreso,3
