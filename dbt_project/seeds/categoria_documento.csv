@@ -1,0 +1,11 @@
+grupo,tipo_de_documento,categoria,signo
+Emitido,Factura electrónica,venta,1
+Emitido,Nota de crédito electrónica,venta,-1
+Emitido,Documento soporte con no obligados,pago_prestadores,1
+Emitido,Nomina Individual,nomina,1
+Recibido,Factura electrónica,compra,1
+Recibido,Factura electrónica de contingencia,compra,1
+Recibido,Documento equivalente POS,compra,1
+Recibido,Documento equivalente - Transporte aéreo de pasajeros,compra,1
+Recibido,Nota de crédito electrónica,compra,-1
+Recibido,Application response,evento_dian,0

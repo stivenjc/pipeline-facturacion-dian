@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: categoria_documento
+    description: "Clasifica cada combinación de grupo y tipo de documento DIAN en una categoría de negocio y un signo."
+    columns:
+      - name: categoria
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["venta", "compra", "pago_prestadores", "nomina", "evento_dian"]
+      - name: signo
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [-1, 0, 1]
+                quote: false

@@ -14,3 +14,15 @@ models:
       - name: total
         tests:
           - not_null
+
+  - name: slv_documentos_clasificados
+    description: "Cada documento con su categoría de negocio, su signo y sus montos netos."
+    columns:
+      - name: cufe_cude
+        tests:
+          - unique
+          - not_null
+      - name: categoria
+        description: "Si queda vacía, apareció un tipo de documento que no está en el seed."
+        tests:
+          - not_null
