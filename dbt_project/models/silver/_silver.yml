@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: slv_documentos
+    description: "Documentos DIAN con tipos correctos y sin duplicados."
+    columns:
+      - name: cufe_cude
+        tests:
+          - unique
+          - not_null
+      - name: fecha_emision
+        tests:
+          - not_null
+      - name: total
+        tests:
+          - not_null

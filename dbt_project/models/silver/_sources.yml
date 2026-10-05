@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: facturacion_dian
+        description: "Facturación electrónica DIAN cargada tal cual (personas anonimizadas)."

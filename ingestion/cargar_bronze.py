@@ -12,8 +12,9 @@ Decisiones de diseño:
     - Tabla particionada por mes sobre la columna `periodo` (fecha de emisión).
     - Idempotente: cada mes se carga con WRITE_TRUNCATE sobre SU partición,
       así recargar un mes reemplaza ese mes y no toca los demás.
-    - Datos de nómina: nombre y cédula del empleado se reemplazan por un hash
-      ANTES de salir del computador. Los archivos locales no se modifican.
+    - Personas naturales (nómina y documentos soporte): nombre y cédula se
+      reemplazan por un hash ANTES de salir del computador. Los archivos
+      locales no se modifican.
     - Al final compara filas y suma de `total` contra lo local.
 """
 import hashlib
@@ -30,7 +31,9 @@ log = logging.getLogger(__name__)
 
 ENTRADA = Path("data/bronze")
 TABLA = "facturacion_dian"
-TIPO_NOMINA = "Nomina Individual"
+# Tipos de documento cuyo "receptor" es una PERSONA NATURAL (empleado o prestador
+# de servicios). Su nombre y cédula se reemplazan por un hash antes de subir.
+TIPOS_CON_PERSONAS = ["Nomina Individual", "Documento soporte con no obligados"]
 CLUSTERING = ["grupo", "tipo_de_documento"]
 
 
@@ -41,19 +44,19 @@ def leer_parquets() -> pd.DataFrame:
     return pd.concat((pd.read_parquet(a) for a in archivos), ignore_index=True)
 
 
-def anonimizar_nomina(df: pd.DataFrame, sal: str) -> pd.DataFrame:
-    """Reemplaza nombre y cédula de los empleados por un hash estable.
+def anonimizar_personas(df: pd.DataFrame, sal: str) -> pd.DataFrame:
+    """Reemplaza nombre y cédula de personas naturales por un hash estable.
 
-    Estable = el mismo empleado produce siempre el mismo hash, así se puede
-    seguir contando empleados distintos sin saber quiénes son.
+    Estable = la misma persona produce siempre el mismo hash, así se puede
+    seguir contando personas distintas sin saber quiénes son.
     """
     def h(valor: str) -> str:
         return hashlib.sha256(f"{sal}|{valor}".encode()).hexdigest()[:16]
 
-    es_nomina = df["tipo_de_documento"] == TIPO_NOMINA
+    es_persona = df["tipo_de_documento"].isin(TIPOS_CON_PERSONAS)
     for col in ["nit_receptor", "nombre_receptor"]:
-        df.loc[es_nomina, col] = df.loc[es_nomina, col].map(h)
-    log.info("Nómina anonimizada: %d filas", es_nomina.sum())
+        df.loc[es_persona, col] = df.loc[es_persona, col].map(h)
+    log.info("Personas anonimizadas en %d filas", es_persona.sum())
     return df
 
 
@@ -121,7 +124,7 @@ def main() -> None:
     sal = os.environ["ANON_SALT"]
 
     df = leer_parquets()
-    df = anonimizar_nomina(df, sal)
+    df = anonimizar_personas(df, sal)
     df = agregar_periodo(df)
 
     client = bigquery.Client(project=proyecto, location=ubicacion)
