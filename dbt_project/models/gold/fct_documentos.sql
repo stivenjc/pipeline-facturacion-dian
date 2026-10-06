@@ -1,7 +1,7 @@
 select
     cufe_cude,
     fecha_emision,
-    case when grupo = 'Emitido' then nit_receptor else nit_emisor end as nit_tercero,
+    nit_tercero,
     categoria,
     tipo_de_documento,
     prefijo,

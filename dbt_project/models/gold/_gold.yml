@@ -75,3 +75,14 @@ models:
       - name: total_nomina
         tests:
           - not_null
+
+  - name: rpt_documentos
+    description: "Tabla ancha para el dashboard: una fila por documento, con dimensiones incluidas y una columna por concepto."
+    columns:
+      - name: cufe_cude
+        tests:
+          - unique
+          - not_null
+      - name: tercero
+        tests:
+          - not_null
