@@ -40,6 +40,30 @@ roles as (
     from contrapartes
     group by nit
 
+),
+
+actividad_clientes as (
+
+    -- Cuándo compra cada cliente. Solo cuentan las facturas de venta:
+    -- una nota crédito corrige una compra, no es una compra nueva.
+    select
+        nit_tercero                                       as nit,
+        min(date_trunc(fecha_emision, month))             as primer_mes_compra,
+        max(date_trunc(fecha_emision, month))             as ultimo_mes_compra,
+        count(distinct date_trunc(fecha_emision, month))  as meses_con_compras
+    from {{ ref('slv_documentos_clasificados') }}
+    where categoria = 'venta'
+      and tipo_de_documento = 'Factura electrónica'
+    group by nit_tercero
+
+),
+
+referencia as (
+
+    -- Último mes con datos: contra él se mide cuánto lleva cada cliente sin comprar
+    select max(date_trunc(fecha_emision, month)) as mes_referencia
+    from {{ ref('slv_documentos_clasificados') }}
+
 )
 
 select
@@ -48,8 +72,20 @@ select
     n.variantes_nombre,
     r.es_cliente,
     r.es_proveedor,
-    r.es_prestador
+    r.es_prestador,
+    a.primer_mes_compra,
+    a.ultimo_mes_compra,
+    a.meses_con_compras,
+    date_diff(ref.mes_referencia, a.ultimo_mes_compra, month) as meses_sin_comprar,
+    case
+        when a.nit is null then null
+        when date_diff(ref.mes_referencia, a.ultimo_mes_compra, month) >= 3 then 'Inactivo'
+        else 'Activo'
+    end as estado_cliente
 from nombre_elegido as n
 join roles as r
     on n.nit = r.nit
+left join actividad_clientes as a
+    on n.nit = a.nit
+cross join referencia as ref
 where n.orden = 1

@@ -59,6 +59,13 @@ models:
       - name: base_neta
         tests:
           - not_null
+      - name: rango_factura
+        description: "Tamaño de la factura de venta sin IVA. No aplica para notas crédito, compras y prestadores."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["1. Menos de 500 mil", "2. De 500 mil a 10 millones", "3. Más de 10 millones", "No aplica"]
 
   - name: fct_nomina_mensual
     description: "Nómina agregada por mes. Sin detalle por persona. El total es el que reporta la DIAN; falta confirmar si es devengado o neto."
@@ -85,4 +92,34 @@ models:
           - not_null
       - name: tercero
         tests:
+          - not_null
+      - name: tipo_cliente_mes
+        description: "Nuevo si es el primer mes de compra del cliente, Recurrente si ya había comprado antes. No aplica para compras y prestadores."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Nuevo", "Recurrente", "No aplica"]
+      - name: estado_cliente
+        description: "Activo si el cliente compró en los últimos 3 meses de datos, Inactivo si no. No aplica para compras y prestadores."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Activo", "Inactivo", "No aplica"]
+      - name: forma_pago
+        description: "Contado o Crédito, traducido del código de la DIAN."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Contado", "Crédito", "Sin dato"]
+
+  - name: rpt_balance_mensual
+    description: "Ingresos, gastos y resultado por mes, solo con documentos de la DIAN. No es utilidad contable."
+    columns:
+      - name: periodo
+        description: "Primer día del mes."
+        tests:
+          - unique
           - not_null

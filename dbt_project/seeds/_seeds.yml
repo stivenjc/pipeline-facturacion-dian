@@ -34,3 +34,14 @@ seeds:
           - accepted_values:
               arguments:
                 values: ["ingreso", "egreso"]
+
+  - name: forma_pago
+    description: "Traduce el código de forma de pago de la DIAN (1 contado, 2 crédito). Confirmar con el cliente."
+    config:
+      column_types:
+        codigo: string
+    columns:
+      - name: codigo
+        tests:
+          - unique
+          - not_null
